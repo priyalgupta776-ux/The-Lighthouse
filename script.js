@@ -537,3 +537,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 })();
+
+const chatToggle=document.getElementById("chat-toggle");
+const chatWindow=document.getElementById("window");
+const chatClose=document.getElementById("close");
+const chatbody=document.getElementById("chat-body");
+
+let greet=false;
+chatToggle.addEventListener("click",()=>{
+  chatWindow.classList.toggle('hidden');
+  if(!greet){
+    addmessage("Hello! Welcome to The LightHouse!");
+    addmessage("How can I help you ?");
+    greet=true;
+  }
+});
+
+chatClose.addEventListener("click",()=> {
+  chatWindow.classList.add("hidden");
+});
+
+function addmessage(text){
+  chatbody.innerHTML += `
+  <div class="message bot">
+  ${text}
+  </div> `;
+  chatbody.scrollTop=chatbody.scrollHeight;
+
+}
+function Replies(option){
+  let reply="";
+  switch(option){
+    case "About":
+      reply="The Lighthouse is A Legacy of Flavor. For over three decades, The Lighthouse has been a beacon of culinary excellence.";
+      break;
+    case "Location":
+      reply = "We are loacted at 123 Harbor View Drive Coastal City, CA 90210.";
+      break;
+    case "Reservation":
+      reply = "You can reserve your table using our reservation form.";
+      break;
+
+    case "Call":
+      reply = "Contact us at (555) 123-4567.";
+      break;
+    
+    case "Other":
+      reply="For more information, kindly email us at : reservations@thelighthouse.com";
+      break;
+
+    default:
+      reply = "Sorry, I couldn't understand that.";
+    
+  }
+  addmessage(reply);
+}
