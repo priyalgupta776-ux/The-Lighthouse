@@ -1,3 +1,21 @@
+// DOM Elements
+const nav = document.getElementById("nav");
+const navToggle = document.getElementById("navToggle");
+const navMenu = document.getElementById("navMenu");
+const navLinks = document.querySelectorAll(".nav-link");
+// Menu tabs/panels removed — menu uses filter buttons and data-category items
+const heroBg = document.getElementById("heroBg");
+const reservationBg = document.getElementById("reservationBg");
+const reservationForm = document.getElementById("reservationForm");
+const dateInput = document.getElementById("reservation-date");
+const timeSelect = document.getElementById("time");
+const themeToggle = document.getElementById("themeToggle");
+if (dateInput) {
+  const tomorrow = new Date(Date.now() + 86400000);
+  const maxDate  = new Date(Date.now() + 90 * 86400000);
+
+  dateInput.setAttribute("min", tomorrow.toISOString().split("T")[0]);
+  dateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
 // ── Device detection (used by FIX #9 and FIX #14) ───
 const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 //DOM ELEMENT
@@ -196,6 +214,11 @@ function smoothScroll(e) {
   const targetSection = document.querySelector(targetId);
 
   if (targetSection) {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const offsetTop = targetSection.offsetTop - 80;
+    window.scrollTo({
+      top: offsetTop,
+      behavior: prefersReduced ? "auto" : "smooth",
     // FIX #15 partial — respect reduced motion in smooth scroll too
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
@@ -321,6 +344,8 @@ const style = document.createElement('style');
 style.textContent = `.visible { opacity: 1 !important; transform: translateY(0) !important; }`;
 document.head.appendChild(style);
 
+// Scroll to Discover - Auto slow scroll
+const heroScroll = document.querySelector(".hero-scroll");
 // ── Auto-scroll on hero "Scroll To Discover" click ───
 const heroScroll = document.querySelector('.hero-scroll');
 let autoScrollInterval = null;
@@ -376,6 +401,7 @@ navToggle.addEventListener('click', toggleMobileMenu);
 
 navLinks.forEach((link) => link.addEventListener('click', smoothScroll));
 
+// Menu tab listeners removed — menu uses filter buttons
 document.querySelectorAll('.nav-cta, .nav-cta-mobile, .hero-buttons a').forEach((link) => {
   link.addEventListener('click', smoothScroll);
 });
@@ -416,6 +442,50 @@ function renderReviews() {
   const userReviews = getReviews();
   const allReviews  = [pinnedReview, ...userReviews];
 
+  grid.innerHTML = "";
+
+  allReviews.forEach((r) => {
+    const card = document.createElement("div");
+    card.className = "review-card";
+
+    const stars = document.createElement("div");
+    stars.className = "review-stars";
+    stars.textContent =
+      "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+
+    const text = document.createElement("p");
+    text.className = "review-text";
+    text.textContent = r.text;
+
+    const author = document.createElement("div");
+    author.className = "review-author";
+
+    const avatar = document.createElement("div");
+    avatar.className = "review-avatar";
+    avatar.textContent = r.name.slice(0, 2).toUpperCase();
+
+    const info = document.createElement("div");
+
+    const name = document.createElement("span");
+    name.className = "review-name";
+    name.textContent = r.name;
+
+    const date = document.createElement("span");
+    date.className = "review-date";
+    date.textContent = r.date;
+
+    info.appendChild(name);
+    info.appendChild(date);
+
+    author.appendChild(avatar);
+    author.appendChild(info);
+
+    card.appendChild(stars);
+    card.appendChild(text);
+    card.appendChild(author);
+
+    grid.appendChild(card);
+  });
   grid.innerHTML = allReviews
     .map(
       (r) => `
@@ -536,6 +606,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Filter within whichever panel is currently active
     const activePanels = document.querySelectorAll('.menu-panel.active');
 
+// Init
+renderReviews();
+
+// BackToTop
+const backToTopBtn = document.getElementById("backToTop");
+
+if (backToTopBtn) {
+  window.addEventListener("scroll", () => {
+    const past = window.scrollY > 300;
+    backToTopBtn.style.display = past ? "block" : "none";
+    backToTopBtn.classList.toggle("visible", past);
+  });
+
+  backToTopBtn.addEventListener("click", () => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReduced ? "auto" : "smooth",
+    });
+  });
+}
     activePanels.forEach(panel => {
       const items = panel.querySelectorAll('.menu-item');
       let visibleCount = 0;
